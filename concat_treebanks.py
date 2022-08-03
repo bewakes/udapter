@@ -30,14 +30,18 @@ train, dev, test = list(zip(*[treebanks[k] for k in treebanks]))
 
 PER_LANG_SENTS = 1500
 
+IN_LANGS = [x.strip() for x in open('languages/in-langs.txt').readlines()]
+
 for treebank, name in zip([train, dev, test], ["train.conllu", "dev.conllu", "test.conllu"]):
     lang_sent_count = {}
     with open(os.path.join(args.output_dir, name), 'w') as write:
         for t in treebank:
             if not t:
                 continue
+            lang = os.path.basename(t).split('-')[0].split('_')[0]
+            if name == 'train.conllu' and lang not in IN_LANGS:
+                break
             with open(t, 'r') as read:
-                lang = os.path.basename(t).split('-')[0].split('_')[0]
                 if not args.lang_id:
                     shutil.copyfileobj(read, write)
                 else:
